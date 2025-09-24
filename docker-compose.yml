@@ -1,0 +1,122 @@
+version: "3.9"
+services:
+  user-service:
+    build: ./user-service
+    ports:
+      - "8001:8000"
+    environment:
+      - MONGO_URI=mongodb://users_db:27017
+    depends_on:
+      - users_db
+    networks:
+      - backend
+
+  transaction-service:
+    build: ./transaction-service
+    ports:
+      - "8002:8000"
+    environment:
+      - MONGO_URI=mongodb://transactions_db:27017
+    depends_on:
+      - transactions_db
+    networks:
+      - backend
+
+  category-service:
+    build: ./category-service
+    ports:
+      - "8003:8000"
+    environment:
+      - MONGO_URI=mongodb://categories_db:27017
+    depends_on:
+      - categories_db
+    networks:
+      - backend
+
+  reporting-service:
+    build: ./reporting-service
+    ports:
+      - "8004:8000"
+    environment:
+      - MONGO_URI=mongodb://transactions_db:27017
+    depends_on:
+      - transactions_db
+    networks:
+      - backend
+
+  notification-service:
+    build: ./notification-service
+    ports:
+      - "8005:8000"
+    environment:
+      - MONGO_URI=mongodb://notifications_db:27017
+    depends_on:
+      - notifications_db
+    networks:
+      - backend
+
+  api-gateway:
+    build: ./api-gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - user-service
+      - transaction-service
+      - category-service
+      - reporting-service
+      - notification-service
+    networks:
+      - backend
+
+  nginx-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile.nginx
+    ports:
+      - "80:80"
+    depends_on:
+      - api-gateway
+    networks:
+      - frontend
+      - backend
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - nginx-gateway
+    networks:
+      - frontend
+
+  users_db:
+    image: mongo
+    ports:
+      - "27017:27017"
+    networks:
+      - backend
+
+  transactions_db:
+    image: mongo
+    ports:
+      - "27018:27017"
+    networks:
+      - backend
+
+  categories_db:
+    image: mongo
+    ports:
+      - "27019:27017"
+    networks:
+      - backend
+
+  notifications_db:
+    image: mongo
+    ports:
+      - "27020:27017"
+    networks:
+      - backend
+
+networks:
+  frontend:
+  backend:
