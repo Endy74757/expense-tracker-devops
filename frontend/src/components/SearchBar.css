@@ -1,0 +1,26 @@
+.search-box {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.search-box label {
+    font-weight: 500;
+    font-size: 1rem;
+    color: #495057;
+}
+
+.search-box input {
+    flex-grow: 1;
+    /* Styles are inherited from .form-group input in App.css */
+}
+
+.search-box button {
+    /* Styles are inherited from the general button style in App.css */
+    flex-shrink: 0; /* Prevent button from shrinking */
+}

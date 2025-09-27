@@ -1,0 +1,30 @@
+# ===================================================================
+# Global .gitignore
+#
+# Recommended for the root of a monorepo.
+# Specific rules can be added to .gitignore files in subdirectories.
+# ===================================================================
+
+# IDE and editor files
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+!.vscode/launch.json
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS-generated files
+.DS_Store
+Thumbs.db
+
+# Log files
+*.log
+
+# Local environment variables
+.env
+.env.*.local
+

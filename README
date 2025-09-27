@@ -1,0 +1,90 @@
+# Expense Tracker DevOps
+
+[![Build Status](https://img.shields.io/travis/your-username/expense-tracker-devops.svg?style=flat-square)](https://travis-ci.org/your-username/expense-tracker-devops)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)
+
+โปรเจกต์ Expense Tracker สำหรับฝึกฝนและสาธิตการทำ DevOps ประกอบด้วย Frontend, Backend และ Infrastructure as Code
+
+## โครงสร้างโปรเจกต์
+
+โปรเจกต์นี้เป็น Monorepo ที่ประกอบด้วย Service ต่างๆ ดังนี้:
+
+-   `/frontend`: เว็บแอปพลิเคชันสำหรับผู้ใช้งาน (สร้างด้วย React + vite)
+-   `/category-service`: Microservice สำหรับจัดการหมวดหมู่ (สร้างด้วย Python/FastAPI)
+-   `/user-service`: Microservice สำหรับจัดการผู้ใช้และการยืนยันตัวตน (สร้างด้วย ... )
+-   `/transaction-service`: Microservice สำหรับจัดการธุรกรรม (สร้างด้วย ... )
+-   `/docker`: ไฟล์ Docker Compose และ Dockerfile สำหรับการพัฒนาในเครื่อง
+-   `/kubernetes`:ไฟล์ Manifest สำหรับ Deploy บน Kubernetes
+
+## คุณสมบัติหลัก (Features)
+
+-   การยืนยันตัวตนผู้ใช้ (Authentication)
+-   การจัดการหมวดหมู่รายรับ-รายจ่าย
+-   การบันทึกและดูประวัติธุรกรรม
+-   สรุปผลและแสดงกราฟ
+
+## เทคโนโลยีที่ใช้ (Tech Stack)
+
+-   **Frontend:** [React + vite]
+-   **Backend:** Python, FastAPI
+-   **Database:** MongoDB
+-   **Containerization:** Docker, Docker Compose
+-   **Orchestration:** Kubernetes
+-   **CI/CD:** Jenkins
+
+## การติดตั้งและเริ่มใช้งาน (Getting Started)
+
+###สิ่งที่ต้องมี (Prerequisites)
+
+-   Docker
+-   Docker Compose
+-   Node.js (สำหรับพัฒนา Frontend)
+-   Python (สำหรับพัฒนา Backend)
+
+### การรันโปรเจกต์บนเครื่อง (Local Development)
+
+1.  **Clone a repository:**
+
+    ```bash
+    git clone https://github.com/Endy74757/expense-tracker-devops.git
+    cd expense-tracker-devops
+    ```
+
+2.  **ตั้งค่า Environment Variables:**
+
+    คัดลอกไฟล์ `.env.example` ไปเป็น `.env` ในแต่ละ service และแก้ไขค่าที่จำเป็น
+
+3.  **ติดตั้ง Dependencies ของ Frontend:**
+
+    ```bash
+    cd frontend
+    npm install
+    ```
+
+4.  **รันทุกอย่างด้วย Docker Compose:**
+
+    กลับมาที่โฟลเดอร์หลักของโปรเจกต์ แล้วรันคำสั่ง:
+    ```bash
+    docker-compose up --build
+    ```
+
+5.  **เข้าถึงแอปพลิเคชัน:**
+    -   Frontend: http://localhost:5173
+
+## การทดสอบ (Testing)
+
+-   **รันเทสของ Frontend:**
+    ```bash
+    cd frontend
+    npm test
+    ```
+-   **รันเทสของ Category Service:**
+    ```bash
+    cd category-service
+    pytest
+    ```
+
+## ผู้จัดทำ (Contributors)
+
+-   F_Supalurk
+

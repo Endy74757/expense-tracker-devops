@@ -1,3 +1,7 @@
 fastapi
+pydantic
+python-dotenv
+motor
+uvicorn
 uvicorn[standard]
-pymongo
+python-jose[cryptography]

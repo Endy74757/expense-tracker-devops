@@ -1,0 +1,3 @@
+show dbs
+mongo
+exit

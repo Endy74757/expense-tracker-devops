@@ -1,0 +1,17 @@
+# Python specific
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environment
+venv
+.venv
+env/
+
+# Test and coverage artifacts
+.pytest_cache/
+.coverage
+.coverage.*

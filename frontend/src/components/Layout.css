@@ -1,0 +1,120 @@
+.app-layout {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    width: 100%;
+    background-color: #f4f7f9;
+}
+
+.app-header {
+    background-color: #ffffff;
+    border-bottom: 1px solid #e0e6ed;
+    padding: 0 2rem;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.header-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1280px;
+    margin: 0 auto;
+    height: 64px;
+}
+
+.logo a {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #0056b3;
+    text-decoration: none;
+}
+
+.app-nav {
+    display: flex;
+    gap: 2rem;
+}
+
+.app-nav a {
+    text-decoration: none;
+    color: #555;
+    font-weight: 500;
+    padding: 8px 0;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s ease-in-out;
+}
+
+.app-nav a.active,
+.app-nav a:hover {
+    color: #007bff;
+    border-bottom-color: #007bff;
+}
+
+.user-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.app-content {
+    flex-grow: 1;
+    padding: 2rem;
+    max-width: 1280px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+/* --- Mobile Responsive Styles --- */
+
+.mobile-menu-toggle {
+    display: none; /* Hidden by default */
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #333;
+}
+
+.mobile-nav {
+    display: none; /* Hidden by default */
+}
+
+@media (max-width: 768px) {
+    .app-header {
+        padding: 0 1rem;
+    }
+
+    .app-content {
+        padding: 1rem;
+    }
+
+    .desktop-nav, .user-name {
+        display: none; /* Hide desktop nav and user name on mobile */
+    }
+
+    .mobile-menu-toggle {
+        display: block; /* Show hamburger icon */
+    }
+
+    .mobile-nav {
+        display: flex;
+        flex-direction: column;
+        background-color: #ffffff;
+        position: absolute;
+        top: 64px; /* Height of the header */
+        left: 0;
+        right: 0;
+        border-bottom: 1px solid #e0e6ed;
+        padding: 1rem;
+        gap: 1rem;
+    }
+
+    .mobile-nav a {
+        border-bottom: none;
+        padding: 0.5rem;
+        border-radius: 4px;
+    }
+
+    .mobile-nav a:hover, .mobile-nav a.active {
+        background-color: #f0f8ff;
+    }
+}

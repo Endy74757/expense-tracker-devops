@@ -1,0 +1,55 @@
+/* src/components/TransactionList.css */
+.transaction-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+.transaction-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    gap: 10px;
+}
+
+.transaction-list li:last-child {
+    border-bottom: none;
+}
+
+.transaction-list li.income .amount {
+    color: #28a745; /* Green */
+}
+
+.transaction-list li.expense .amount {
+    color: #dc3545; /* Red */
+}
+
+.transaction-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.transaction-details .note {
+    font-weight: 500;
+}
+
+.transaction-details .date {
+    font-size: 0.8em;
+    color: #6c757d;
+}
+
+.transaction-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.transaction-actions .edit-btn,
+.transaction-actions .delete-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.1em;
+    padding: 5px;
+}
