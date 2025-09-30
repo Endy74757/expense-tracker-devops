@@ -1,0 +1,38 @@
+{{- range $name, $service := .Values.services }}
+  {{- if and (kindIs "map" $service) $service.enabled $service.image }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $name | lower }}
+  labels:
+    app: {{ $name | lower }}
+spec:
+  replicas: {{ $.Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ $name | lower }}
+  template:
+    metadata:
+      labels:
+        app: {{ $name | lower }}
+    spec:
+      containers:
+        - name: {{ $name | lower }}
+          image: "{{- if $.Values.image.registry -}}{{ $.Values.image.registry }}/{{- end -}}{{ $service.image.repository }}:{{ $service.image.tag | default $.Chart.AppVersion }}"
+          imagePullPolicy: {{ $.Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ $service.targetPort }}
+              protocol: TCP
+          env:
+            - name: MONGO_URI
+              value: "mongodb://{{ $service.database.host }}:{{ $service.database.port }}"
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: expense-tracker-secret
+                  key: SECRET_KEY
+
+  {{- end }}
+{{- end }}

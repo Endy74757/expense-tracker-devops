@@ -15,7 +15,7 @@ const TransactionForm = ({ onSubmit, onCancel, initialData, categories = [] }) =
             setType(initialData.type);
             setDate(new Date(initialData.date).toISOString().split('T')[0]);
             setNote(initialData.note || '');
-            setCategoryId(initialData.category_id || ''); // This should be the ID string
+            setCategoryId(initialData.category_id || ''); // This should be the ID string, which it is now.
         } else {
             // Reset form for new transaction
             setAmount('');

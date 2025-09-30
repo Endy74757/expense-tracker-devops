@@ -15,10 +15,11 @@ const Dashboard = () => {
     const { user, token, logout, fetchCurrentUser } = useAuth();
     const navigate = useNavigate();
     const [transactions, setTransactions] = useState([]);
-    const [isLoading, setIsLoading] = useState(true); // Start with loading true
+    const [isTransactionsLoading, setIsTransactionsLoading] = useState(true);
+    const [isCategoriesLoading, setIsCategoriesLoading] = useState(true);
     const [error, setError] = useState('');
     const [isFormVisible, setIsFormVisible] = useState(false);
-    const [categories, setCategories] = useState([]);
+    const [categories, setCategories] = useState({ list: [], map: {} }); // Initialize as an object
     const [editingTransaction, setEditingTransaction] = useState(null); // To hold data for editing
     const [categoryFilter, setCategoryFilter] = useState(''); // State for category filter, '' means all
     const [currentPage, setCurrentPage] = useState(1); // State for pagination
@@ -35,7 +36,7 @@ const Dashboard = () => {
     }, [user, token]); // Re-run when user or token changes
 
     const fetchTransactions = async (userId) => {
-        setIsLoading(true);
+        setIsTransactionsLoading(true);
         setError('');
         try {
             // The user_id is now derived from the token on the backend.
@@ -57,12 +58,13 @@ const Dashboard = () => {
         } catch (err) {
             setError(err.message);
         } finally {
-            setIsLoading(false);
+            setIsTransactionsLoading(false);
         }
     };
 
     const fetchCategories = async () => {
         if (!token) return;
+        setIsCategoriesLoading(true);
         try {
             const response = await fetch(`${API_GATEWAY_URL}/categories`, {
                 headers: { 'Authorization': `Bearer ${token}` },
@@ -78,9 +80,11 @@ const Dashboard = () => {
                 acc[cat.id] = cat.name;
                 return acc;
             }, {});
-            setCategories({ list: data, map: categoryMap });
+            setCategories({ list: data, map: categoryMap }); // Ensure both list and map are set
         } catch (err) {
             console.error("Error fetching categories:", err.message);
+        } finally {
+            setIsCategoriesLoading(false);
         }
     };
 
@@ -159,6 +163,8 @@ const Dashboard = () => {
     if (!user) {
         return <div className="loading">กำลังโหลดข้อมูลผู้ใช้...</div>;
     }
+
+    const isLoading = isTransactionsLoading || isCategoriesLoading;
 
     // Filter transactions based on the selected category
     const filteredTransactions = transactions.filter(tx => {

@@ -15,7 +15,13 @@ from fastapi.middleware.cors import CORSMiddleware
 # -------------------------------
 load_dotenv()
 
-SECRET_KEY = os.environ.get("SECRET_KEY")   # 👉 เปลี่ยนเป็น secret จริงของคุณ
+try:
+    SECRET_KEY = os.environ["SECRET_KEY"]
+except KeyError:
+    # This will cause the application to crash on startup if the SECRET_KEY is not set,
+    # which is a good practice for required configurations.
+    raise RuntimeError("SECRET_KEY environment variable not set. Application cannot start.")
+
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
@@ -24,8 +30,15 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="users/login")
 
 app = FastAPI(title="User Service")
 
-# MongoDB Client
-client = motor.motor_asyncio.AsyncIOMotorClient("mongodb://mongo_users:27017")
+# MongoDB Client (Read from environment variable)
+try:
+    MONGO_URI = os.environ["MONGO_URI"]
+except KeyError:
+    # This will cause the application to crash on startup if the MONGO_URI is not set,
+    # which is a good practice for required configurations.
+    raise RuntimeError("MONGO_URI environment variable not set. Application cannot start.")
+
+client = motor.motor_asyncio.AsyncIOMotorClient(MONGO_URI)
 db = client["users_service"]   # database
 users_collection = db["users_db"]  # collection
 

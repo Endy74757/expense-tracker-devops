@@ -14,7 +14,12 @@ from fastapi.security import OAuth2PasswordBearer
 # --------------------------------
 # Config
 # --------------------------------
-MONGO_URI = "mongodb://mongo_transactions:27017"
+try:
+    MONGO_URI = os.environ["MONGO_URI"]
+except KeyError:
+    # This will cause the application to crash on startup if the MONGO_URI is not set,
+    # which is a good practice for required configurations.
+    raise RuntimeError("MONGO_URI environment variable not set. Application cannot start.")
 DB_NAME = "transactions_service"
 COLLECTION_NAME = "transactions_db"
 

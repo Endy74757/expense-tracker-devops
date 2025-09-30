@@ -15,7 +15,11 @@ ALGORITHM = "HS256"
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token") # URL ไม่สำคัญใน service นี้
 
 # --- MongoDB Connection ---
-MONGO_URI = os.environ.get("MONGO_URI", "mongodb://mongo_categories:27017")
+try:
+    MONGO_URI = os.environ["MONGO_URI"]
+except KeyError:
+    raise RuntimeError("MONGO_URI environment variable not set. Application cannot start.")
+
 client = motor.motor_asyncio.AsyncIOMotorClient(MONGO_URI)
 db = client["categories_db"]
 categories_collection = db["categories"]

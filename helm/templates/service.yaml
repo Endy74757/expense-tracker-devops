@@ -1,0 +1,21 @@
+{{- range $name, $service := .Values.services }}
+  {{- if and (kindIs "map" $service) $service.enabled $service.image }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $name | lower }}
+  labels:
+    app: {{ $name | lower }}
+spec:
+  type: ClusterIP
+  ports:
+    - port: {{ $service.port }}
+      targetPort: {{ $service.targetPort }}
+      protocol: TCP
+      name: http
+  selector:
+    app: {{ $name | lower }}
+
+  {{- end }}
+{{- end }}
