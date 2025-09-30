@@ -2,7 +2,6 @@ pipeline{
   agent any
 
   parameters {
-    string(name: 'GIT_BRANCH', defaultValue: 'main', description: 'Select the branch to build and deploy.')
     choice(name: 'SERVICE_NAME', choices: ['all', 'userService', 'transactionService', 'categoryService'], description: 'Select the service to build and deploy. Choose "all" to build all services.')
   }
 
@@ -21,7 +20,7 @@ pipeline{
   stages{
     stage('Checkout Source Code') {
       steps {
-        checkout([$class: 'GitSCM', branches: [[name: "${params.GIT_BRANCH}"]], userRemoteConfigs: [[url: GIT_REPO_URL, credentialsId: GIT_CREDENTIALS_ID]]])
+        checkout scm
         // Read values.yaml to get the list of services
         script {
           def values = readYaml file: 'helm/values.yaml'
@@ -30,22 +29,20 @@ pipeline{
       }
     }
 
-    stage('Build, Push and Update') {
-      matrix {
-        axes {
-          axis {
-            name 'SERVICE'
-            values env.SERVICES_TO_BUILD.split(',')
-          }
-        }
-        stages {
-          stage('Build and Push Docker Image') {
-            steps {
-              script {
-                def serviceName = "${SERVICE}".trim()
+    stage('Build and Push Images') {
+      steps {
+        script {
+          def services = env.SERVICES_TO_BUILD.split(',')
+          def parallelStages = [:]
+
+          for (service in services) {
+            def serviceName = service.trim()
+            parallelStages[serviceName] = {
+              stage("Build and Push: ${serviceName}") {
+                // This logic now runs in parallel for each service
                 def imageName = "${DOCKERHUB_USERNAME}/${serviceName.replace('Service', '-service').toLowerCase()}"
                 def imageTag = (env.BRANCH_NAME == 'main' || env.BRANCH_NAME == 'master') ? "v1.0.${BUILD_NUMBER}" : "dev-${BUILD_NUMBER}"
-                
+
                 echo "Building image for ${serviceName}: ${imageName}:${imageTag}"
                 docker.build("${imageName}:${imageTag}", "backend/${serviceName.replace('Service', '-service')}")
 
@@ -53,12 +50,15 @@ pipeline{
                   echo "Pushing image: ${imageName}:${imageTag}"
                   docker.image("${imageName}:${imageTag}").push()
                 }
+
                 // Create a properties file to store the new tag and stash it
                 writeFile file: ".tags/${serviceName}.properties", text: "IMAGE_TAG=${imageTag}"
                 stash name: "tags-${serviceName}", includes: ".tags/${serviceName}.properties"
               }
             }
           }
+          // Run all the generated stages in parallel
+          parallel parallelStages
         }
       }
     }
