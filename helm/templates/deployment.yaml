@@ -34,7 +34,7 @@ spec:
                   name: expense-tracker-secret
                   key: SECRET_KEY
           resources:
-            {{- toYaml $service.resource | nindent 12 }}
+            {{- toYaml $service.resources | nindent 12 }}
 
   {{- end }}
 {{- end }}
