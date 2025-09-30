@@ -1,6 +1,6 @@
 # Expense Tracker DevOps
 
-[![Build Status](https://img.shields.io/travis/your-username/expense-tracker-devops.svg?style=flat-square)](https://travis-ci.org/your-username/expense-tracker-devops)
+[![Build Status](https://img.shields.io/travis/Endy74757/expense-tracker-devops.svg?style=flat-square)](https://travis-ci.org/Endy74757/expense-tracker-devops)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)
 
 โปรเจกต์ Expense Tracker สำหรับฝึกฝนและสาธิตการทำ DevOps ประกอบด้วย Frontend, Backend และ Infrastructure as Code
@@ -11,8 +11,8 @@
 
 -   `/frontend`: เว็บแอปพลิเคชันสำหรับผู้ใช้งาน (สร้างด้วย Vue/React/Svelte)
 -   `/category-service`: Microservice สำหรับจัดการหมวดหมู่ (สร้างด้วย Python/FastAPI)
--   `/user-service`: Microservice สำหรับจัดการผู้ใช้และการยืนยันตัวตน (สร้างด้วย ... )
--   `/transaction-service`: Microservice สำหรับจัดการธุรกรรม (สร้างด้วย ... )
+-   `/user-service`: Microservice สำหรับจัดการผู้ใช้และการยืนยันตัวตน (สร้างด้วย Python/FastAPI)
+-   `/transaction-service`: Microservice สำหรับจัดการธุรกรรม (สร้างด้วย Python/FastAPI)
 -   `/docker`: ไฟล์ Docker Compose และ Dockerfile สำหรับการพัฒนาในเครื่อง
 -   `/kubernetes`:ไฟล์ Manifest สำหรับ Deploy บน Kubernetes
 
@@ -25,12 +25,12 @@
 
 ## เทคโนโลยีที่ใช้ (Tech Stack)
 
--   **Frontend:** [ระบุชื่อเฟรมเวิร์ก เช่น Vue.js, React]
+-   **Frontend:** [React]
 -   **Backend:** Python, FastAPI
 -   **Database:** MongoDB
 -   **Containerization:** Docker, Docker Compose
 -   **Orchestration:** Kubernetes
--   **CI/CD:** GitHub Actions
+-   **CI/CD:** Jenkins
 
 ## การติดตั้งและเริ่มใช้งาน (Getting Started)
 
@@ -46,7 +46,7 @@
 1.  **Clone a repository:**
 
     ```bash
-    git clone https://github.com/your-username/expense-tracker-devops.git
+    git clone https://github.com/Endy74757/expense-tracker-devops.git
     cd expense-tracker-devops
     ```
 
@@ -87,5 +87,5 @@
 
 ## ผู้จัดทำ (Contributors)
 
--   ชื่อของคุณ
+-   F_Supalurk
 
