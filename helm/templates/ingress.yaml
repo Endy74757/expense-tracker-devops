@@ -24,13 +24,15 @@ spec:
     http:
       paths:
         {{- range .paths }}
+        {{- $serviceName := .service -}}
+        {{- $serviceValues := (index $.Values.services $serviceName) -}}
         - path: {{ .path }}
           pathType: ImplementationSpecific
           backend:
             service:
-              name: {{ .service | lower }}
+              name: {{ printf "%s-%s" $.Release.Name $serviceName | lower }}
               port:
-                number: {{ (index $.Values.services .service).port }}
+                number: {{ $serviceValues.port }}
         {{- end }}
     {{- end }}
 {{- end }}
