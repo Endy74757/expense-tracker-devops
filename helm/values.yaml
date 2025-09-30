@@ -21,6 +21,14 @@ services:
     database:
       host: "mongo-users"
       port: 27017
+    resources:
+      resources:
+      requests:
+        cpu: "100m"     # ร้องขอ CPU 0.1 core (100 millicores)
+        memory: "128Mi" # ร้องขอ Memory 128 Mebibytes
+      limits:
+        cpu: "500m"     # จำกัด CPU ไม่เกิน 0.5 core
+        memory: "512Mi" # จำกัด Memory ไม่เกิน 512 Mebibytes
 
   transactionService:
     enabled: true
@@ -32,6 +40,12 @@ services:
     database:
       host: "mongo-transactions"
       port: 27017
+    requests:
+        cpu: "100m"     # ร้องขอ CPU 0.1 core (100 millicores)
+        memory: "128Mi" # ร้องขอ Memory 128 Mebibytes
+      limits:
+        cpu: "500m"     # จำกัด CPU ไม่เกิน 0.5 core
+        memory: "512Mi" # จำกัด Memory ไม่เกิน 512 Mebibytes
 
   categoryService:
     enabled: true
@@ -43,6 +57,12 @@ services:
     database:
       host: "mongo-categories"
       port: 27017
+    requests:
+        cpu: "100m"     # ร้องขอ CPU 0.1 core (100 millicores)
+        memory: "128Mi" # ร้องขอ Memory 128 Mebibytes
+      limits:
+        cpu: "500m"     # จำกัด CPU ไม่เกิน 0.5 core
+        memory: "512Mi" # จำกัด Memory ไม่เกิน 512 Mebibytes
 
 # กำหนดค่าสำหรับ MongoDB StatefulSets
 mongo:
@@ -50,7 +70,7 @@ mongo:
     repository: mongo
     tag: "6.0"
   storage:
-    size: 1Gi
+    size: 512Mi
   users:
     enabled: true
   categories:
