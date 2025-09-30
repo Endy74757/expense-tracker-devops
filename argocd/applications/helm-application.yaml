@@ -3,6 +3,9 @@ kind: Application
 metadata:
   name: expense-tracker-helm
   namespace: argocd
+  # Sync wave 1: ติดตั้งหลังจาก wave 0 เสร็จสิ้น
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
 spec:
   project: default
   source:

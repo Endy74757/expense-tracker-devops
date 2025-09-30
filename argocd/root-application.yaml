@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: root-app
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/Endy74757/expense-tracker-devops.git
+    targetRevision: HEAD
+    path: argocd/applications # ชี้ไปยังโฟลเดอร์ที่มีแอปพลิเคชันลูกทั้งหมด
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
