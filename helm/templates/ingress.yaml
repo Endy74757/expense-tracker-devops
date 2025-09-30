@@ -20,17 +20,20 @@ spec:
   {{- end }}
   rules:
     {{- range .Values.ingress.hosts }}
-  - host: {{ .host | quote }}
-    http:
-      paths:
-        {{- range .paths }}
-        - path: {{ .path }}
-          pathType: ImplementationSpecific
-          backend:
-            service:
-              name: {{ .service | lower }}
-              port:
-                number: {{ (index $.Values.services .service).port }}
-        {{- end }}
+    - {{ if .host }}
+      host: {{ .host | quote }}
+      {{ end }}
+      http:
+        paths:
+          {{- range .paths }}
+            {{- $servicePort := (index $.Values.services .service).port }}
+          - path: {{ .path }}
+            pathType: Prefix # ใช้ Prefix หรือ Exact ตามความเหมาะสม
+            backend:
+              service:
+                name: {{ .service | lower }}
+                port:
+                  number: {{ $servicePort }}
+          {{- end }}
     {{- end }}
 {{- end }}
