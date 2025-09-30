@@ -20,23 +20,17 @@ spec:
   {{- end }}
   rules:
     {{- range .Values.ingress.hosts }}
-    {{- if .host }}
-    - host: {{ .host | quote }}
-    {{- else }}
-    -
-    {{- end }}
+  - host: {{ .host | quote }}
     http:
       paths:
         {{- range .paths }}
-        {{- $serviceName := .service -}}
-        {{- $serviceValues := (index $.Values.services $serviceName) -}}
         - path: {{ .path }}
           pathType: ImplementationSpecific
           backend:
             service:
-              name: {{ printf "%s-%s" $.Release.Name $serviceName | lower }}
+              name: {{ .service | lower }}
               port:
-                number: {{ $serviceValues.port }}
+                number: {{ (index $.Values.services .service).port }}
         {{- end }}
     {{- end }}
 {{- end }}

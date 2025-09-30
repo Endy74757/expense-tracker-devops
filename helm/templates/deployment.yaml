@@ -4,18 +4,18 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ printf "%s-%s" $.Release.Name $name | lower }}
+  name: {{ $name | lower }}
   labels:
-    app: {{ printf "%s-%s" $.Release.Name $name | lower }}
+    app: {{ $name | lower }}
 spec:
   replicas: {{ $.Values.replicaCount }}
   selector:
     matchLabels:
-      app: {{ printf "%s-%s" $.Release.Name $name | lower }}
+      app: {{ $name | lower }}
   template:
     metadata:
       labels:
-        app: {{ printf "%s-%s" $.Release.Name $name | lower }}
+        app: {{ $name | lower }}
     spec:
       containers:
         - name: {{ $name | lower }}
