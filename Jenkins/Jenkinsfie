@@ -1,0 +1,127 @@
+pipeline{
+  agent any
+
+  parameters {
+    choice(name: 'SERVICE_NAME', choices: ['all', 'userService', 'transactionService', 'categoryService'], description: 'Select the service to build and deploy. Choose "all" to build all services.')
+  }
+
+  environment {
+    // ============== Configuration ==============
+    // --- Docker ---
+    DOCKERHUB_CREDENTIALS_ID = 'dockerhub-credentials'
+    DOCKERHUB_USERNAME       = 'endy95' // แก้ไขเป็นชื่อผู้ใช้ Docker Hub ของคุณ
+    // --- Git ---
+    GIT_REPO_URL             = "https://github.com/Endy74757/expense-tracker-devops.git"
+    GIT_CREDENTIALS_ID       = 'github-credentials'
+    GIT_USER_NAME            = 'Jenkins Bot' // ชื่อที่จะแสดงใน commit
+    GIT_USER_EMAIL           = 'jenkins-bot@example.com' // อีเมลที่จะแสดงใน commit
+  }
+
+  stages{
+    stage('Checkout Source Code') {
+      steps {
+        checkout scm
+        // Read values.yaml to get the list of services
+        script {
+          def values = readYaml file: 'helm/values.yaml'
+          env.SERVICES_TO_BUILD = (params.SERVICE_NAME == 'all') ? values.services.keySet().join(',') : params.SERVICE_NAME
+        }
+      }
+    }
+
+    stage('Build, Push and Update') {
+      matrix {
+        axes {
+          axis {
+            name 'SERVICE'
+            values env.SERVICES_TO_BUILD.split(',')
+          }
+        }
+        stages {
+          stage('Build and Push Docker Image') {
+            steps {
+              script {
+                def serviceName = "${SERVICE}".trim()
+                def imageName = "${DOCKERHUB_USERNAME}/${serviceName.replace('Service', '-service').toLowerCase()}"
+                def imageTag = (env.BRANCH_NAME == 'main' || env.BRANCH_NAME == 'master') ? "v1.0.${BUILD_NUMBER}" : "dev-${BUILD_NUMBER}"
+                
+                echo "Building image for ${serviceName}: ${imageName}:${imageTag}"
+                docker.build("${imageName}:${imageTag}", "backend/${serviceName.replace('Service', '-service')}")
+
+                docker.withRegistry('https://registry.hub.docker.com', DOCKERHUB_CREDENTIALS_ID) {
+                  echo "Pushing image: ${imageName}:${imageTag}"
+                  docker.image("${imageName}:${imageTag}").push()
+                }
+                // Create a properties file to store the new tag and stash it
+                writeFile file: ".tags/${serviceName}.properties", text: "IMAGE_TAG=${imageTag}"
+                stash name: "tags-${serviceName}", includes: ".tags/${serviceName}.properties"
+              }
+            }
+          }
+        }
+      }
+    }
+
+    stage('Update Git & Deploy') {
+      stages {
+        stage('Deploy to Production') {
+          when {
+            anyOf {
+              branch 'main'
+              branch 'master'
+            }
+          }
+          steps {
+            script {
+              echo "Updating image tags in helm/values.yaml for Production"
+              // Using sed as a fallback for yq
+              // sed -i "s/\(services\.${serviceName}\.image\.tag: \).*/\1\"${props.IMAGE_TAG}\"/" helm/values.yaml
+              // Explanation:
+              // 1. Find the line containing "services.SERVICE_NAME.image.tag:"
+              // 2. Capture the part before the tag value `(...)`
+              // 3. Replace the rest of the line `.*` with the captured group `\1` and the new tag
+              for (service in env.SERVICES_TO_BUILD.split(',')) {
+                def serviceName = service.trim()
+                unstash "tags-${serviceName}"
+                def props = readProperties file: ".tags/${serviceName}.properties"
+                sh "sed -i 's|\\(services:\\s*${serviceName}:\\s*image:\\s*tag:\\s*\\).*|\\1\"${props.IMAGE_TAG}\"|' helm/values.yaml"
+              }
+              withCredentials([usernamePassword(credentialsId: GIT_CREDENTIALS_ID, usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
+                sh """
+                  git config --global user.email "${GIT_USER_EMAIL}"
+                  git config --global user.name "${GIT_USER_NAME}"
+                  git add helm/values.yaml
+                  git commit -m "ci(prod): Update image tags for ${SERVICES_TO_BUILD} to build ${BUILD_NUMBER}"
+                  git push "https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/Endy74757/expense-tracker-devops.git" HEAD:${env.BRANCH_NAME}
+                """
+              }
+            }
+          }
+        }
+        stage('Deploy to Development') {
+          when { branch 'dev' }
+          steps {
+            script {
+              echo "Updating image tags in helm/values-dev.yaml for Development"
+              for (service in env.SERVICES_TO_BUILD.split(',')) {
+                def serviceName = service.trim()
+                unstash "tags-${serviceName}"
+                def props = readProperties file: ".tags/${serviceName}.properties"
+                sh "sed -i 's|\\(services:\\s*${serviceName}:\\s*image:\\s*tag:\\s*\\).*|\\1\"${props.IMAGE_TAG}\"|' helm/values-dev.yaml"
+              }
+              withCredentials([usernamePassword(credentialsId: GIT_CREDENTIALS_ID, usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
+                sh """
+                  git config --global user.email "${GIT_USER_EMAIL}"
+                  git config --global user.name "${GIT_USER_NAME}"
+                  git add helm/values-dev.yaml
+                  git commit -m "ci(dev): Update image tags for ${SERVICES_TO_BUILD} to build ${BUILD_NUMBER}"
+                  git push "https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/Endy74757/expense-tracker-devops.git" HEAD:${env.BRANCH_NAME}
+                """
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
