@@ -17,17 +17,17 @@ pipeline{
     GIT_USER_EMAIL           = 'jenkins-bot@example.com' // อีเมลที่จะแสดงใน commit
   }
 
-//   stages{
-//     stage('Checkout Source Code') {
-//       steps {
-//         checkout scm
-//         // Read values.yaml to get the list of services
-//         script {
-//           def values = readYaml file: 'helm/values.yaml'
-//           env.SERVICES_TO_BUILD = (params.SERVICE_NAME == 'all') ? values.services.keySet().join(',') : params.SERVICE_NAME
-//         }
-//       }
-//     }
+  stages{
+    stage('Checkout Source Code') {
+      steps {
+        checkout scm
+        // Read values.yaml to get the list of services
+        script {
+          def values = readYaml file: 'helm/values.yaml'
+          env.SERVICES_TO_BUILD = (params.SERVICE_NAME == 'all') ? values.services.keySet().join(',') : params.SERVICE_NAME
+        }
+      }
+    }
 
 //     stage('Build, Push and Update') {
 //       matrix {
@@ -123,5 +123,5 @@ pipeline{
 //         }
 //       }
 //     }
-//   }
+  }
 }
