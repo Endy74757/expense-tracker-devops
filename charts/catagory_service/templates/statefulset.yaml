@@ -1,42 +1,44 @@
-{{- range $name, $db := .Values.mongo }}
-  {{- if and (kindIs "map" $db) $db.enabled }}
----
+{{- if .Values.mongo.categories.enabled }}
+
 apiVersion: v1
 kind: Service
 metadata:
-  name: mongo-{{ $name }}
+  name: {{ .Values.service.database.host }}
   labels:
-    app: mongo-{{ $name }}
+    app: {{ .Values.service.database.host }}
 spec:
   ports:
     - port: 27017
       targetPort: 27017
   selector:
-    app: mongo-{{ $name }}
+    app: {{ .Values.service.database.host }}
 ---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: mongo-{{ $name }}
+  name: {{ .Values.service.database.host }}
 spec:
-  serviceName: mongo-{{ $name }}
+  serviceName: {{ .Values.service.database.host }}
   replicas: 1
   selector:
     matchLabels:
-      app: mongo-{{ $name }}
+      app: {{ .Values.service.database.host }}
   template:
     metadata:
       labels:
-        app: mongo-{{ $name }}
+        app: {{ .Values.service.database.host }}
     spec:
       containers:
         - name: mongo
-          image: "{{ $.Values.mongo.image.repository }}:{{ $.Values.mongo.image.tag }}"
+          image: "{{ .Values.mongo.image.repository }}:{{ .Values.mongo.image.tag }}"
           ports:
             - containerPort: 27017
           volumeMounts:
             - name: mongo-persistent-storage
               mountPath: /data/db
+      env:
+        - name: ENVIRONMENT
+          value: {{ $.Values.environment }}
   volumeClaimTemplates:
     - metadata:
         name: mongo-persistent-storage
@@ -44,6 +46,6 @@ spec:
         accessModes: [ "ReadWriteOnce" ]
         resources:
           requests:
-            storage: {{ $.Values.mongo.storage.size }}
-  {{- end }}
+            storage: {{ .Values.mongo.storage.size }}
+
 {{- end }}

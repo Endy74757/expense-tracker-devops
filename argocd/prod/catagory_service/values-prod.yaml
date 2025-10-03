@@ -1,4 +1,5 @@
 # ค่าทั่วไป
+environment: "prod"
 replicaCount: 1
 secretKey: "d0X4R9u9aB8Gq7tZx3vH2mKfQyP1jL6E" # ควรเปลี่ยน หรือใช้ --set ตอนติดตั้ง
 
@@ -11,47 +12,11 @@ image:
 
 services:
   # กำหนดค่าสำหรับแต่ละ Service
-  userService:
-    enabled: true
-    image:
-      repository: user_service
-      tag: "v0.1"
-    port: 8001
-    targetPort: 8000
-    database:
-      host: "mongo-users"
-      port: 27017
-    resources:
-      requests:
-        cpu: "100m"     # ร้องขอ CPU 0.1 core (100 millicores)
-        memory: "128Mi" # ร้องขอ Memory 128 Mebibytes
-      limits:
-        cpu: "500m"     # จำกัด CPU ไม่เกิน 0.5 core
-        memory: "512Mi" # จำกัด Memory ไม่เกิน 512 Mebibytes
-
-  transactionService:
-    enabled: true
-    image:
-      repository: transaction_service
-      tag: "v0.1"
-    port: 8002
-    targetPort: 8000
-    database:
-      host: "mongo-transactions"
-      port: 27017
-    resources:
-      requests:
-          cpu: "100m"     # ร้องขอ CPU 0.1 core (100 millicores)
-          memory: "128Mi" # ร้องขอ Memory 128 Mebibytes
-      limits:
-        cpu: "500m"     # จำกัด CPU ไม่เกิน 0.5 core
-        memory: "512Mi" # จำกัด Memory ไม่เกิน 512 Mebibytes
-
   categoryService:
     enabled: true
     image:
       repository: category_service
-      tag: "v0.1"
+      tag: "latest"
     port: 8003
     targetPort: 8000
     database:
@@ -72,12 +37,9 @@ mongo:
     tag: "6.0"
   storage:
     size: 1Gi
-  users:
-    enabled: true
   categories:
     enabled: true
-  transactions:
-    enabled: true
+
 
 # กำหนดค่าสำหรับ Ingress
 ingress:

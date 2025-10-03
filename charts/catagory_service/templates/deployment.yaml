@@ -1,24 +1,23 @@
-{{- range $name, $service := .Values.services }}
-  {{- if and (kindIs "map" $service) $service.enabled $service.image }}
----
+{{- $service := .Values.service }}
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ $name | lower }}
+  name: {{ $service.name | lower }}
   labels:
-    app: {{ $name | lower }}
+    app: {{ $service.name | lower }}
 spec:
   replicas: {{ $.Values.replicaCount }}
   selector:
     matchLabels:
-      app: {{ $name | lower }}
+      app: {{ $service.name | lower }}
   template:
     metadata:
       labels:
-        app: {{ $name | lower }}
+        app: {{ $service.name | lower }}
     spec:
       containers:
-        - name: {{ $name | lower }}
+        - name: {{ $service.name | lower }}
           image: "{{- if $.Values.image.registry -}}{{ $.Values.image.registry }}/{{- end -}}{{ $service.image.repository }}:{{ $service.image.tag | default $.Chart.AppVersion }}"
           imagePullPolicy: {{ $.Values.image.pullPolicy }}
           ports:
@@ -33,8 +32,7 @@ spec:
                 secretKeyRef:
                   name: expense-tracker-secret
                   key: SECRET_KEY
+            - name: ENVIRONMENT
+              value: {{ $.Values.environment }}
           resources:
             {{- toYaml $service.resources | nindent 12 }}
-
-  {{- end }}
-{{- end }}

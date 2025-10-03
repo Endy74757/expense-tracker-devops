@@ -1,129 +1,107 @@
-pipeline{
-  agent any
+// Jenkinsfile
+pipeline {
+    agent any
 
-  parameters {
-    choice(name: 'SERVICE_NAME', choices: ['all', 'userService', 'transactionService', 'categoryService'], description: 'Select the service to build and deploy. Choose "all" to build all services.')
-  }
-
-  environment {
-    // ============== Configuration ==============
-    // --- Docker ---
-    DOCKERHUB_CREDENTIALS_ID = 'dockerhub-credentials'
-    DOCKERHUB_USERNAME       = 'endy95' // แก้ไขเป็นชื่อผู้ใช้ Docker Hub ของคุณ
-    // --- Git ---
-    GIT_REPO_URL             = "https://github.com/Endy74757/expense-tracker-devops.git"
-    GIT_CREDENTIALS_ID       = 'github-credentials'
-    GIT_USER_NAME            = 'Jenkins Bot' // ชื่อที่จะแสดงใน commit
-    GIT_USER_EMAIL           = 'jenkins-bot@example.com' // อีเมลที่จะแสดงใน commit
-  }
-
-  stages{
-    stage('Checkout Source Code') {
-      steps {
-        checkout scm
-        // Read values.yaml to get the list of services
-        script {
-          def values = readYaml file: 'helm/values.yaml'
-          env.SERVICES_TO_BUILD = (params.SERVICE_NAME == 'all') ? values.services.keySet().join(',') : params.SERVICE_NAME
-        }
-      }
+    environment {
+        // กำหนด Registry ของ Docker และชื่อ Image
+        // เช่น docker.io/your-username หรือ gcr.io/your-project-id
+        DOCKER_REGISTRY = "endy95"
+        DOCKER_IMAGE_NAME = "expense-tracker-devops"
+        // กำหนด Credentials ID สำหรับ Docker Hub/Registry ที่ตั้งค่าไว้ใน Jenkins
+        DOCKER_CREDENTIALS_ID = "dockerhub-credentials"
     }
 
-    stage('Build and Push Images') {
-      steps {
-        script {
-          def services = env.SERVICES_TO_BUILD.split(',')
-          def parallelStages = [:]
+    stages {
+        stage('Checkout') {
+            steps {
+                echo 'กำลังดึงซอร์สโค้ด...'
+                // ดึงโค้ดจาก Git Repository ของคุณ
+                // คุณต้องตั้งค่า Repository URL ใน Jenkins Job Configuration
+                checkout scm
+            }
+        }
 
-          for (service in services) {
-            def serviceName = service.trim()
-            parallelStages[serviceName] = {
-              stage("Build and Push: ${serviceName}") {
-                // This logic now runs in parallel for each service
-                def imageName = "${DOCKERHUB_USERNAME}/${serviceName.replace('Service', '-service').toLowerCase()}"
-                def imageTag = (env.BRANCH_NAME == 'main' || env.BRANCH_NAME == 'master') ? "v1.0.${BUILD_NUMBER}" : "dev-${BUILD_NUMBER}"
+        stage('Build') {
+            steps {
+                echo 'กำลัง Build โปรเจกต์ด้วย Maven...'
+                // ใช้ Maven ในการ build โปรเจกต์ (จะทำการ compile และ run unit tests)
+                // หากโปรเจกต์ของคุณเป็น Node.js ให้เปลี่ยนเป็น 'npm install'
+                sh 'mvn clean install'
+            }
+        }
 
-                echo "Building image for ${serviceName}: ${imageName}:${imageTag}"
-                docker.build("${imageName}:${imageTag}", "backend/${serviceName.replace('Service', '-service')}")
+        stage('Code Analysis (Optional)') {
+            // Stage นี้เป็นทางเลือก สำหรับการวิเคราะห์คุณภาพโค้ดด้วย SonarQube
+            // หากไม่ต้องการใช้ สามารถลบ stage นี้ออกได้
+            when { expression { false } } // ปิดการใช้งาน stage นี้ไว้ก่อน
+            steps {
+                echo 'กำลังวิเคราะห์คุณภาพโค้ดด้วย SonarQube...'
+                // คุณต้องตั้งค่า SonarQube Server ใน Jenkins ก่อน
+                // withSonarQubeEnv('Your-SonarQube-Server') {
+                //     sh 'mvn sonar:sonar'
+                // }
+            }
+        }
 
-                docker.withRegistry('https://registry.hub.docker.com', DOCKERHUB_CREDENTIALS_ID) {
-                  echo "Pushing image: ${imageName}:${imageTag}"
-                  docker.image("${imageName}:${imageTag}").push()
+        stage('Build Docker Image') {
+            steps {
+                echo 'กำลังสร้าง Docker image...'
+                script {
+                    // สร้าง tag สำหรับ image โดยใช้ Build Number ของ Jenkins
+                    def imageTag = "${env.BUILD_NUMBER}"
+                    // สร้างชื่อ image แบบเต็ม
+                    def fullImageName = "/:"
+                    // คำสั่ง build image
+                    sh "docker build -t  ."
                 }
-
-                // Create a properties file to store the new tag and stash it
-                writeFile file: ".tags/${serviceName}.properties", text: "IMAGE_TAG=${imageTag}"
-                stash name: "tags-${serviceName}", includes: ".tags/${serviceName}.properties"
-              }
             }
-          }
-          // Run all the generated stages in parallel
-          parallel parallelStages
         }
-      }
+
+        stage('Push Docker Image') {
+            steps {
+                echo 'กำลัง Push Docker image ไปยัง Registry...'
+                script {
+                    def imageTag = "${env.BUILD_NUMBER}"
+                    def fullImageName = "/:"
+                    // Login เข้า Docker Registry โดยใช้ Credentials ที่ตั้งค่าไว้ใน Jenkins
+                    withCredentials([usernamePassword(credentialsId: DOCKER_CREDENTIALS_ID, usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                        sh "echo  | docker login  -u  --password-stdin"
+                        sh "docker push "
+                    }
+                }
+            }
+        }
+
+        stage('Deploy to Staging') {
+            // ตัวอย่างการ Deploy ไปยัง Kubernetes
+            // คุณต้องตั้งค่า Kubeconfig ใน Jenkins Credentials ก่อน
+            steps {
+                echo 'กำลัง Deploy ไปยัง Staging Environment...'
+                // withKubeconfig([credentialsId: 'kubeconfig-staging']) {
+                //     sh "kubectl set image deployment/expense-tracker-deployment app=/:${env.BUILD_NUMBER}"
+                // }
+            }
+        }
     }
 
-
-    stage('Update Git & Deploy') {
-      stages {
-        stage('Deploy to Production') {
-          when {
-            anyOf {
-              branch 'main'
-              branch 'master'
-            }
-          }
-          steps {
-            script {
-              echo "Updating image tags in helm/values.yaml for Production"
-              // Using sed as a fallback for yq
-              // sed -i "s/\(services\.${serviceName}\.image\.tag: \).*/\1\"${props.IMAGE_TAG}\"/" helm/values.yaml
-              // Explanation:
-              // 1. Find the line containing "services.SERVICE_NAME.image.tag:"
-              // 2. Capture the part before the tag value `(...)`
-              // 3. Replace the rest of the line `.*` with the captured group `\1` and the new tag
-              for (service in env.SERVICES_TO_BUILD.split(',')) {
-                def serviceName = service.trim()
-                unstash "tags-${serviceName}"
-                def props = readProperties file: ".tags/${serviceName}.properties"
-                sh "sed -i 's|\\(services:\\s*${serviceName}:\\s*image:\\s*tag:\\s*\\).*|\\1\"${props.IMAGE_TAG}\"|' helm/values.yaml"
-              }
-              withCredentials([usernamePassword(credentialsId: GIT_CREDENTIALS_ID, usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
-                sh """
-                  git config --global user.email "${GIT_USER_EMAIL}"
-                  git config --global user.name "${GIT_USER_NAME}"
-                  git add helm/values.yaml
-                  git commit -m "ci(prod): Update image tags for ${SERVICES_TO_BUILD} to build ${BUILD_NUMBER}"
-                  git push "https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/Endy74757/expense-tracker-devops.git" HEAD:${env.BRANCH_NAME}
-                """
-              }
-            }
-          }
+    post {
+        always {
+            // ขั้นตอนที่จะทำเสมอ ไม่ว่า pipeline จะสำเร็จหรือล้มเหลว
+            echo 'Pipeline เสร็จสิ้น'
+            // ทำความสะอาด workspace
+            cleanWs()
+            // Logout จาก Docker Registry
+            sh "docker logout "
         }
-        stage('Deploy to Development') {
-          when { branch 'dev' }
-          steps {
-            script {
-              echo "Updating image tags in helm/values-dev.yaml for Development"
-              for (service in env.SERVICES_TO_BUILD.split(',')) {
-                def serviceName = service.trim()
-                unstash "tags-${serviceName}"
-                def props = readProperties file: ".tags/${serviceName}.properties"
-                sh "sed -i 's|\\(services:\\s*${serviceName}:\\s*image:\\s*tag:\\s*\\).*|\\1\"${props.IMAGE_TAG}\"|' helm/values-dev.yaml"
-              }
-              withCredentials([usernamePassword(credentialsId: GIT_CREDENTIALS_ID, usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
-                sh """
-                  git config --global user.email "${GIT_USER_EMAIL}"
-                  git config --global user.name "${GIT_USER_NAME}"
-                  git add helm/values-dev.yaml
-                  git commit -m "ci(dev): Update image tags for ${SERVICES_TO_BUILD} to build ${BUILD_NUMBER}"
-                  git push "https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/Endy74757/expense-tracker-devops.git" HEAD:${env.BRANCH_NAME}
-                """
-              }
-            }
-          }
+        success {
+            // ขั้นตอนที่จะทำเมื่อ pipeline สำเร็จ
+            echo 'Pipeline สำเร็จ!'
+            // สามารถเพิ่มการแจ้งเตือนไปยัง Slack หรือ Email ที่นี่
         }
-      }
+        failure {
+            // ขั้นตอนที่จะทำเมื่อ pipeline ล้มเหลว
+            echo 'Pipeline ล้มเหลว!'
+            // สามารถเพิ่มการแจ้งเตือนไปยัง Slack หรือ Email ที่นี่
+        }
     }
-  }
 }

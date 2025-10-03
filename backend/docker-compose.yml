@@ -23,7 +23,7 @@ services:
     ports:
       - "27018:27017"
     volumes:
-      - ./user-service/mongo_users_data:/data/db
+      - ./user_service/mongo_users_data:/data/db
     networks:
       - backend
 
@@ -47,12 +47,12 @@ services:
     ports:
       - "27020:27017"
     volumes:
-      - ./transaction-service/mongo_transactions_data:/data/db
+      - ./transaction_service/mongo_transactions_data:/data/db
     networks:
       - backend
 
   user_service:
-    build: ./user-service
+    build: ./user_service
     image: user_service
     container_name: user_service
     restart: always
@@ -67,7 +67,7 @@ services:
       - backend
   
   transaction_service:
-    build: ./transaction-service
+    build: ./transaction_service
     image: transaction_service
     container_name: transaction_service
     restart: always
@@ -82,7 +82,7 @@ services:
       - backend
   
   category_service:
-    build: ./category-service
+    build: ./category_service
     image: category_service
     container_name: category_service
     restart: always
