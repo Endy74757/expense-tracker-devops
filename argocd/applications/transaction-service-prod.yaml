@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: transaction_service-prod
+  name: transaction-service-prod
   namespace: argocd
 spec:
   project: default
@@ -11,7 +11,7 @@ spec:
     path: charts/transaction_service
     helm:
       valueFiles:
-        - ../prod/transaction_service/values-prod.yaml # ใช้ values สำหรับ dev
+        - ../prod/transaction-service/values-prod.yaml # ใช้ values สำหรับ dev
   destination:
     server: https://kubernetes.default.svc
     namespace: expense-tracker-helm-prod-demo # Deploy ไปที่ namespace ของ prod
