@@ -8,7 +8,7 @@ spec:
   source:
     repoURL: https://github.com/Endy74757/expense-tracker-devops.git
     targetRevision: dev # ชี้ไปที่ dev branch
-    path: charts/catagory_service
+    path: charts/category_service
     helm:
       valueFiles:
         - ../../argocd/dev/catagory_service/values-dev.yaml # ใช้ values สำหรับ dev
