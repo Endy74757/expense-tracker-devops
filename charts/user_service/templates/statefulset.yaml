@@ -1,4 +1,4 @@
-{{- if .Values.mongo.userService.enabled }}
+{{- if .Values.mongo.users.enabled }}
 
 apiVersion: v1
 kind: Service
