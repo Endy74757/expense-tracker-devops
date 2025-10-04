@@ -1,4 +1,4 @@
-{{- $service := .Values.services }}
+{{- $service := .Values.services.userService }}
 
 apiVersion: v1
 kind: Service
