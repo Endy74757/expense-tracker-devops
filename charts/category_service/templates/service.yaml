@@ -1,11 +1,11 @@
-{{- $service := .Values.services }}
+{{- $service := .Values.services.categoryService }}
 
 apiVersion: v1
 kind: Service
 metadata:
-  name: "user-service"
+  name: "category-service"
   labels:
-    app: "user-service"
+    app: "category-service"
 spec:
   type: ClusterIP
   ports:
@@ -14,7 +14,4 @@ spec:
       protocol: TCP
       name: http
   selector:
-    app: "user-service"
-  env:
-    - name: ENVIRONMENT
-      value: {{ $.Values.environment }}
+    app: "category-service"

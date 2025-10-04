@@ -1,23 +1,23 @@
-{{- $service := .Values.services }}
+{{- $service := .Values.services.categoryService }}
 
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ $service.name | lower }}
+  name: "category-service"
   labels:
-    app: {{ $service.name | lower }}
+    app: "category-service"
 spec:
   replicas: {{ $.Values.replicaCount }}
   selector:
     matchLabels:
-      app: {{ $service.name | lower }}
+      app: "category-service"
   template:
     metadata:
       labels:
-        app: {{ $service.name | lower }}
+        app: "category-service"
     spec:
       containers:
-        - name: {{ $service.name | lower }}
+        - name: "category-service"
           image: "{{- if $.Values.image.registry -}}{{ $.Values.image.registry }}/{{- end -}}{{ $service.image.repository }}:{{ $service.image.tag | default $.Chart.AppVersion }}"
           imagePullPolicy: {{ $.Values.image.pullPolicy }}
           ports:
