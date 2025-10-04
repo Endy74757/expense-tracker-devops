@@ -11,7 +11,7 @@ spec:
     targetRevision: main # ระบุเวอร์ชันเพื่อความเสถียร
     helm:
       valueFiles:
-        - ../prod/ingress/values-prod.yaml # ใช้ values สำหรับ prod
+        - argocd/prod/ingress/values-prod.yaml # ใช้ values สำหรับ prod
   destination:
     server: https://kubernetes.default.svc
     namespace: ingress-prod

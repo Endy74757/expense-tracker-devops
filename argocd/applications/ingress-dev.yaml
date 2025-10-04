@@ -11,7 +11,7 @@ spec:
     targetRevision: dev # ระบุเวอร์ชันเพื่อความเสถียร
     helm:
       valueFiles:
-        - ../dev/ingress/values-dev.yaml # ใช้ values สำหรับ dev
+        - argocd/dev/ingress/values-dev.yaml # ใช้ values สำหรับ dev
   destination:
     server: https://kubernetes.default.svc
     namespace: ingress-dev
