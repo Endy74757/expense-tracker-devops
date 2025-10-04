@@ -11,7 +11,7 @@ spec:
     path: charts/transaction_service
     helm:
       valueFiles:
-        - argocd/dev/transaction-service/values-dev.yaml # ใช้ values สำหรับ dev
+        - ../../argocd/dev/transaction-service/values-dev.yaml # ใช้ values สำหรับ dev
   destination:
     server: https://kubernetes.default.svc
     namespace: expense-tracker-helm-dev-demo # Deploy ไปที่ namespace ของ dev

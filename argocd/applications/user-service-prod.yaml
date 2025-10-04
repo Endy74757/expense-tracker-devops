@@ -11,7 +11,7 @@ spec:
     path: charts/user_service
     helm:
       valueFiles:
-        - argocd/prod/user-service/values-prod.yaml # ใช้ values สำหรับ dev
+        - ../../argocd/prod/user-service/values-prod.yaml # ใช้ values สำหรับ dev
   destination:
     server: https://kubernetes.default.svc
     namespace: expense-tracker-helm-prod-demo # Deploy ไปที่ namespace ของ dev
