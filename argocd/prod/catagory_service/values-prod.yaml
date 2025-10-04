@@ -10,7 +10,7 @@ image:
   registry: "endy95" 
   pullPolicy: IfNotPresent
 
-service:
+services:
   # กำหนดค่าสำหรับแต่ละ Service
   categoryService:
     enabled: true
@@ -39,34 +39,3 @@ mongo:
     size: 1Gi
   categories:
     enabled: true
-
-
-# กำหนดค่าสำหรับ Ingress
-ingress:
-  enabled: true
-  className: "nginx"
-  annotations:
-    nginx.ingress.kubernetes.io/use-regex: "true"
-  # ถ้าต้องการใช้ TLS/HTTPS ให้กำหนดค่าที่นี่
-  # tls:
-  #   - hosts:
-  #       - expense-tracker.example.com
-  #     secretName: expense-tracker-tls-secret
-  hosts:
-    # ตัวอย่างการใช้ Host-based routing
-    # - host: expense-tracker.example.com
-    #   paths:
-    #     - path: /users
-    #       service: userService
-    #     - path: /transactions
-    #       service: transactionService
-    #     - path: /categories
-    #       service: categoryService
-    # การใช้ Path-based routing (แบบเดิม)
-    - paths:
-        - path: /users(/|$)(.*)
-          service: userService
-        - path: /transactions(/|$)(.*)
-          service: transactionService
-        - path: /categories(/|$)(.*)
-          service: categoryService

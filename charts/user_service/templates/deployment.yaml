@@ -1,4 +1,4 @@
-{{- $service := .Values.service }}
+{{- $service := .Values.services }}
 
 apiVersion: apps/v1
 kind: Deployment

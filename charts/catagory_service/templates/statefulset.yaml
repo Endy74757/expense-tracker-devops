@@ -3,30 +3,30 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Values.service.database.host }}
+  name: {{ .Values.services.categoryService.database.host }}
   labels:
-    app: {{ .Values.service.database.host }}
+    app: {{ .Values.services.categoryService.database.host }}
 spec:
   ports:
     - port: 27017
       targetPort: 27017
   selector:
-    app: {{ .Values.service.database.host }}
+    app: {{ .Values.services.categoryService.database.host }}
 ---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ .Values.service.database.host }}
+  name: {{ .Values.services.categoryService.database.host }}
 spec:
-  serviceName: {{ .Values.service.database.host }}
+  serviceName: {{ .Values.services.categoryService.database.host }}
   replicas: 1
   selector:
     matchLabels:
-      app: {{ .Values.service.database.host }}
+      app: {{ .Values.services.categoryService.database.host }}
   template:
     metadata:
       labels:
-        app: {{ .Values.service.database.host }}
+        app: {{ .Values.services.categoryService.database.host }}
     spec:
       containers:
         - name: mongo

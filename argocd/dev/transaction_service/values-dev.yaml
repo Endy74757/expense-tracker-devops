@@ -10,7 +10,7 @@ image:
   registry: "endy95" 
   pullPolicy: IfNotPresent
 
-service:
+services:
   # กำหนดค่าสำหรับแต่ละ Service
   transactionService:
     enabled: true
