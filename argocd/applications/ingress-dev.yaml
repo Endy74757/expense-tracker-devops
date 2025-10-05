@@ -7,7 +7,7 @@ spec:
   project: default
   source:
     repoURL: https://github.com/Endy74757/expense-tracker-devops.git
-    chart: charts/ingress
+    path: charts/ingress
     targetRevision: dev # ระบุเวอร์ชันเพื่อความเสถียร
     helm:
       valueFiles:
