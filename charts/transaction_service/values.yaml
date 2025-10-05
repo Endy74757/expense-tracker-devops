@@ -34,8 +34,8 @@ services:
 mongo:
   image:
     repository: mongo
-    tag: "6.0"
+    tag: "4.4"
   storage:
-    size: 1Gi
+    size: 512Mi
   transactions:
     enabled: true
