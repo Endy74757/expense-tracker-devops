@@ -36,6 +36,6 @@ mongo:
     repository: mongo
     tag: "4.4"
   storage:
-    size: 1Gi
+    size: 512Mi
   users:
     enabled: true
