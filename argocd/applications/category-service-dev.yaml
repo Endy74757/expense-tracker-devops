@@ -1,20 +1,17 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: expense-tracker-helm-dev
+  name: catagory-service-dev
   namespace: argocd
-  # Sync wave 1: ติดตั้งหลังจาก wave 0 เสร็จสิ้น
-  annotations:
-    argocd.argoproj.io/sync-wave: "1"
 spec:
   project: default
   source:
     repoURL: https://github.com/Endy74757/expense-tracker-devops.git
     targetRevision: dev # ชี้ไปที่ dev branch
-    path: helm
+    path: charts/catagory_service
     helm:
       valueFiles:
-        - values-dev.yaml # ใช้ values สำหรับ dev
+        - ../../argocd/dev/catagory_service/values-dev.yaml # ใช้ values สำหรับ dev
   destination:
     server: https://kubernetes.default.svc
     namespace: expense-tracker-helm-dev-demo # Deploy ไปที่ namespace ของ dev

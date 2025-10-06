@@ -26,7 +26,7 @@ spec:
       http:
         paths:
           {{- range .paths }}
-            {{- $servicePort := (index $.Values.services .service).port }}
+            {{- $servicePort := .port }}
           - path: {{ .path }}
             pathType: Prefix # ใช้ Prefix หรือ Exact ตามความเหมาะสม
             backend:
@@ -36,4 +36,7 @@ spec:
                   number: {{ $servicePort }}
           {{- end }}
     {{- end }}
+  env:
+    - name: ENVIRONMENT
+      value: {{ $.Values.environment }}
 {{- end }}

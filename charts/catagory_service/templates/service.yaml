@@ -1,0 +1,17 @@
+{{- $service := .Values.services.categoryService }}
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: "category-service"
+  labels:
+    app: "category-service"
+spec:
+  type: ClusterIP
+  ports:
+    - port: {{ $service.port }}
+      targetPort: {{ $service.targetPort }}
+      protocol: TCP
+      name: http
+  selector:
+    app: "category-service"

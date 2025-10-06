@@ -1,0 +1,35 @@
+# ค่าทั่วไป
+environment: "dev"
+
+# กำหนดค่าสำหรับ Ingress
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+  # ถ้าต้องการใช้ TLS/HTTPS ให้กำหนดค่าที่นี่
+  # tls:
+  #   - hosts:
+  #       - expense-tracker.example.com
+  #     secretName: expense-tracker-tls-secret
+  hosts:
+    # ตัวอย่างการใช้ Host-based routing
+    # - host: expense-tracker.example.com
+    #   paths:
+    #     - path: /users
+    #       service: userService
+    #     - path: /transactions
+    #       service: transactionService
+    #     - path: /categories
+    #       service: categoryService
+    # การใช้ Path-based routing (แบบเดิม)
+    - paths:
+        - path: /users(/|$)(.*)
+          service: userService
+          port: 8001
+        - path: /transactions(/|$)(.*)
+          service: transactionService
+          port: 8002
+        - path: /categories(/|$)(.*)
+          port: 8003
+          service: categoryService

@@ -1,0 +1,107 @@
+// Jenkinsfile
+pipeline {
+    agent any
+
+    environment {
+        // กำหนด Registry ของ Docker และชื่อ Image
+        // เช่น docker.io/your-username หรือ gcr.io/your-project-id
+        DOCKER_REGISTRY = "endy95"
+        DOCKER_IMAGE_NAME = "expense-tracker-devops"
+        // กำหนด Credentials ID สำหรับ Docker Hub/Registry ที่ตั้งค่าไว้ใน Jenkins
+        DOCKER_CREDENTIALS_ID = "dockerhub-credentials"
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                echo 'กำลังดึงซอร์สโค้ด...'
+                // ดึงโค้ดจาก Git Repository ของคุณ
+                // คุณต้องตั้งค่า Repository URL ใน Jenkins Job Configuration
+                checkout scm
+            }
+        }
+
+        stage('Build') {
+            steps {
+                echo 'กำลัง Build โปรเจกต์ด้วย Maven...'
+                // ใช้ Maven ในการ build โปรเจกต์ (จะทำการ compile และ run unit tests)
+                // หากโปรเจกต์ของคุณเป็น Node.js ให้เปลี่ยนเป็น 'npm install'
+                sh 'mvn clean install'
+            }
+        }
+
+        stage('Code Analysis (Optional)') {
+            // Stage นี้เป็นทางเลือก สำหรับการวิเคราะห์คุณภาพโค้ดด้วย SonarQube
+            // หากไม่ต้องการใช้ สามารถลบ stage นี้ออกได้
+            when { expression { false } } // ปิดการใช้งาน stage นี้ไว้ก่อน
+            steps {
+                echo 'กำลังวิเคราะห์คุณภาพโค้ดด้วย SonarQube...'
+                // คุณต้องตั้งค่า SonarQube Server ใน Jenkins ก่อน
+                // withSonarQubeEnv('Your-SonarQube-Server') {
+                //     sh 'mvn sonar:sonar'
+                // }
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                echo 'กำลังสร้าง Docker image...'
+                script {
+                    // สร้าง tag สำหรับ image โดยใช้ Build Number ของ Jenkins
+                    def imageTag = "${env.BUILD_NUMBER}"
+                    // สร้างชื่อ image แบบเต็ม
+                    def fullImageName = "/:"
+                    // คำสั่ง build image
+                    sh "docker build -t  ."
+                }
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                echo 'กำลัง Push Docker image ไปยัง Registry...'
+                script {
+                    def imageTag = "${env.BUILD_NUMBER}"
+                    def fullImageName = "/:"
+                    // Login เข้า Docker Registry โดยใช้ Credentials ที่ตั้งค่าไว้ใน Jenkins
+                    withCredentials([usernamePassword(credentialsId: DOCKER_CREDENTIALS_ID, usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                        sh "echo  | docker login  -u  --password-stdin"
+                        sh "docker push "
+                    }
+                }
+            }
+        }
+
+        stage('Deploy to Staging') {
+            // ตัวอย่างการ Deploy ไปยัง Kubernetes
+            // คุณต้องตั้งค่า Kubeconfig ใน Jenkins Credentials ก่อน
+            steps {
+                echo 'กำลัง Deploy ไปยัง Staging Environment...'
+                // withKubeconfig([credentialsId: 'kubeconfig-staging']) {
+                //     sh "kubectl set image deployment/expense-tracker-deployment app=/:${env.BUILD_NUMBER}"
+                // }
+            }
+        }
+    }
+
+    post {
+        always {
+            // ขั้นตอนที่จะทำเสมอ ไม่ว่า pipeline จะสำเร็จหรือล้มเหลว
+            echo 'Pipeline เสร็จสิ้น'
+            // ทำความสะอาด workspace
+            cleanWs()
+            // Logout จาก Docker Registry
+            sh "docker logout "
+        }
+        success {
+            // ขั้นตอนที่จะทำเมื่อ pipeline สำเร็จ
+            echo 'Pipeline สำเร็จ!'
+            // สามารถเพิ่มการแจ้งเตือนไปยัง Slack หรือ Email ที่นี่
+        }
+        failure {
+            // ขั้นตอนที่จะทำเมื่อ pipeline ล้มเหลว
+            echo 'Pipeline ล้มเหลว!'
+            // สามารถเพิ่มการแจ้งเตือนไปยัง Slack หรือ Email ที่นี่
+        }
+    }
+}

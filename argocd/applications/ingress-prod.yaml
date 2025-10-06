@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: ingress-prod
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/Endy74757/expense-tracker-devops.git
+    path: charts/ingress
+    targetRevision: main # ระบุเวอร์ชันเพื่อความเสถียร
+    helm:
+      valueFiles:
+        - ../../argocd/prod/ingress/values-prod.yaml # ใช้ values สำหรับ prod
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: ingress-prod
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true

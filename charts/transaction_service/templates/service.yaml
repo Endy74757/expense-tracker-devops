@@ -1,0 +1,21 @@
+{{- $service := .Values.services.transactionService }}
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: "transaction-service"
+  labels:
+    app: "transaction-service"
+spec:
+  type: ClusterIP
+  ports:
+    - port: {{ $service.port }}
+      targetPort: {{ $service.targetPort }}
+      protocol: TCP
+      name: http
+  selector:
+    app: "transaction-service"
+  env:
+    - name: ENVIRONMENT
+      value: {{ $.Values.environment }}
+

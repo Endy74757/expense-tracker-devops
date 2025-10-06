@@ -1,0 +1,38 @@
+{{- $service := .Values.services.transactionService }}
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "transaction-service"
+  labels:
+    app: "transaction-service"
+spec:
+  replicas: {{ $.Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: "transaction-service"
+  template:
+    metadata:
+      labels:
+        app: "transaction-service"
+    spec:
+      containers:
+        - name: "transaction-service"
+          image: "{{- if $.Values.image.registry -}}{{ $.Values.image.registry }}/{{- end -}}{{ $service.image.repository }}:{{ $service.image.tag | default $.Chart.AppVersion }}"
+          imagePullPolicy: {{ $.Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ $service.targetPort }}
+              protocol: TCP
+          env:
+            - name: MONGO_URI
+              value: "mongodb://{{ $service.database.host }}:{{ $service.database.port }}"
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: expense-tracker-secret
+                  key: SECRET_KEY
+            - name: ENVIRONMENT
+              value: {{ $.Values.environment }}
+          resources:
+            {{- toYaml $service.resources | nindent 12 }}

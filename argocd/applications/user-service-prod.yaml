@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: user-service-prod
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/Endy74757/expense-tracker-devops.git
+    targetRevision: main # ชี้ไปที่ prod branch
+    path: charts/user_service
+    helm:
+      valueFiles:
+        - ../../argocd/prod/user_service/values-prod.yaml # ใช้ values สำหรับ dev
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: expense-tracker-helm-prod-demo # Deploy ไปที่ namespace ของ dev
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
