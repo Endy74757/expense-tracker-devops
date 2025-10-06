@@ -18,15 +18,15 @@
 ##  โครงสร้างโปรเจกต์
 
 ```
-/frontend              # เว็บแอปพลิเคชัน
+/frontend                      # เว็บแอปพลิเคชัน
 /backend/category-service      # Microservice สำหรับหมวดหมู่
 /backend/user-service          # Microservice สำหรับผู้ใช้
 /backend/transaction-service   # Microservice สำหรับรายการธุรกรรม
-/charts                # Helm charts สำหรับ Kubernetes
-/jenkins               # Jenkins pipeline configuration
-/argocd                # ArgoCD application manifests
-.gitignore             # รายการไฟล์ที่ไม่ต้องการติดตาม
-README.md              # เอกสารนี้
+/charts                        # Helm charts สำหรับ Kubernetes
+/jenkins                       # Jenkins pipeline configuration
+/argocd                        # ArgoCD application manifests
+.gitignore                     # รายการไฟล์ที่ไม่ต้องการติดตาม
+README.md                      # เอกสารนี้
 ```
 
 ---
