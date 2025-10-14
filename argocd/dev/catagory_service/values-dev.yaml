@@ -16,7 +16,7 @@ services:
     enabled: true
     image:
       repository: category_service
-      tag: "latest"
+      tag: "v0.1"
     port: 8003
     targetPort: 8000
     database:
